@@ -9,7 +9,7 @@ const postMessage = async (message, id) => {
   return { statusCode: 200, result: null };
 };
 
-const postMessageToBotChat = async (message, id) => {
+const postMessageToBotChat = async (attachments, id) => {
   await axios
     .post(
       "http://localhost:3978/api/messages",
@@ -29,9 +29,10 @@ const postMessageToBotChat = async (message, id) => {
             },
             recipient: {
             id: "12345678",
-            name: "huy",
+            name: "bot",
             },
-            text: message,
+            text: "ddddd",
+            attachments: attachments
       },
       {
         headers: {
@@ -49,7 +50,7 @@ const postMessageToBotChat = async (message, id) => {
 };
 
 const getMessage = async (body) => {
-  console.log(body.text);
+  console.log(body);
 };
 
 module.exports = {

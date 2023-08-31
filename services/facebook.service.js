@@ -1,4 +1,5 @@
 const axios = require("axios");
+const template = require("../utils/template")
 
 const verifyWebhook = async (req) => {
   try {
@@ -22,7 +23,7 @@ const verifyWebhook = async (req) => {
 
 const postMessage = async (entry) => {
   try {
-    
+
     entry.forEach(async (entry) => {
       entry.messaging.forEach(async (message) => {
         const text = message.message.text;
@@ -45,11 +46,11 @@ const postMessage = async (entry) => {
 };
 
 const getMessage = async (body) => {
-    console.log(body)
-    // body.forEach(async (body) => {
-        // await replyMessage(body.recipient.id, body.text);
-    // });
-  await replyMessage(body.recipient.id, body.text);
+  console.log(body)
+  // body.forEach(async (body) => {
+  // await replyMessage(body.recipient.id, body.text);
+  // });
+  await replyMessage(body.recipient.id, body.text, body.attachments);
   return { statusCode: 200, result: "EVENT_RESPONSE" }
 };
 
@@ -67,7 +68,7 @@ const postMessageToBotChat = async (message, id, sender, recipient, timestamp) =
         type: "message",
         id: id,
         timestamp: timestamp,
-        serviceUrl: "https://aa68-42-114-60-106.ngrok-free.app/apis",
+        serviceUrl: "https://9088-14-161-46-255.ngrok-free.app/apis",
         channelId: "MSG",
         from: {
           id: sender.id,
@@ -81,7 +82,7 @@ const postMessageToBotChat = async (message, id, sender, recipient, timestamp) =
           name: "",
         },
         attributes: {
-            age: ""
+          age: ""
         },
         text: message,
       },
@@ -99,20 +100,57 @@ const postMessageToBotChat = async (message, id, sender, recipient, timestamp) =
     });
 };
 
-const replyMessage = async (recipientId, message) => {
-  await axios
-    .post(
-      "https://graph.facebook.com/v17.0/me/messages?access_token=" + `${process.env.AUTHORIZATION_TOKEN_FB}`,
-      {
-        recipient: { id: recipientId },
-        message: { text: message },
-        messaging_type: "RESPONSE",
+const replyMessage = async (recipientId, message, attachments) => {
+  let body;
+  const attachment = attachments && template.customTemplate(attachments);
+  if (attachments) {
+    body = {
+      recipient: {
+        id: recipientId
+      },
+      message: {
+        attachment: attachment,
       }
-    )
-    .then((response) => {
-      console.log(response.data);
-    })
-    .catch(function (error) {
-      console.error(error.response);
-    });
+    }
+  }
+  // body = {
+  //   recipient: {
+  //     id: "7199182753441977"
+  //   },
+  //   message: {
+  //     attachment: {
+  //       type: "template",
+  //       payload: {
+  //         template_type: "button",
+  //         text: "What do you want to do next?",
+  //         buttons: [
+  //           {
+  //             type: "web_url",
+  //             url: "https://www.messenger.com",
+  //             title: "Visit Messenger"
+  //           }
+  //         ]
+  //       }
+  //     }
+  //   }
+  // }
+else {
+  body = {
+    recipient: { id: recipientId },
+    message: { text: message },
+    messaging_type: "RESPONSE",
+  }
+}
+// console.log()
+await axios
+  .post(
+    "https://graph.facebook.com/v17.0/me/messages?access_token=" + `${process.env.AUTHORIZATION_TOKEN_FB}`,
+    body
+  )
+  .then((response) => {
+    console.log(response.data);
+  })
+  .catch(function (error) {
+    console.error(error.response);
+  });
 };

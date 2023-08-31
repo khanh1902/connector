@@ -7,6 +7,7 @@ const postMessage = async (req, res) => {
 };
 
 const getMessageFromBotChat = async (req, res) => {
+  console.log(req.body);
   const data = await facebookService.getMessage(req.body);
   return res.status(data.statusCode).json(data.result);
 };
